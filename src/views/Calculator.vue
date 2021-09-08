@@ -5,23 +5,20 @@
 
       <div class="container" >
         <b-form-select v-model="selectedBank" :options="banks" @change="changeBank()"></b-form-select>
-        <p>
-          <span>Обязательный платеж</span>
-          <span> {{minPayment}}</span>
-        </p>
-
-        <label for="initialLoan">Сумма кредита {{loan}}$
-        </label>
+        <p><span>Maximum loan: {{maxRange}}$</span></p>
+        <p><span>Down payment: {{minPayment}}$</span></p>
+        <p><span>Loan term: {{loanTerm}} months</span></p>
+        <label for="initialLoan">Loan: {{loan}}$</label>
         <b-form-input id="initialLoan" v-model="loan" type="range" style="width: 100%"
                       :min="minRange" :max="maxRange" :step="stepRange"
         ></b-form-input>
 
-        <b-button variant="outline-primary" style="margin: 0.5em" @click="calculate">Расчитать</b-button>
+        <b-button variant="outline-primary" style="margin: 0.5em" @click="calculate">Calc</b-button>
       </div>
       <div class="row" v-if="this.tableItems.length > 0">
-          <p>Ежемесячный платеж: {{this.tableItems[0]['Total payment']}}$</p>
-          <p>Начисленные проценты {{this.tableItems[0]['Sum']}}%</p>
-          <p>Долг + проценты {{+this.selectedLoan + +this.tableItems[0]['Sum']}}$</p>
+          <p>Total payment: {{this.tableItems[0]['Total payment']}}$</p>
+          <p>Interest payments: {{this.tableItems[0]['Sum']}}$</p>
+          <p>Loan + interest payments: {{+this.selectedLoan + +this.tableItems[0]['Sum']}}$</p>
       </div>
       <div class="row" v-if="tableItems.length > 0">
         <b-table id="mortgageTable" responsive="sm" :fields="tableFields" :items="tableItems" >
@@ -34,7 +31,7 @@
     <div v-else>
       <b-button variant="primary" disabled>
         <b-spinner small type="grow"></b-spinner>
-        Загрузка...
+        Loading...
       </b-button>
     </div>
   </div>
@@ -49,7 +46,7 @@ export default {
   components: {},
   data() {
     return {
-      server: `https://server-elif-tech.herokuapp.com`,
+      server: `https://server-elif-tech.herokuapp.com`, // SERVER ADDRESS
       loading: false,
       banks: [],
       selectedBank: 0,
@@ -59,6 +56,7 @@ export default {
       minRange: 0,
       maxRange: 0,
       stepRange: 0,
+      loanTerm: 0,
       tableFields: ['Month','Total payment','Interest payment','Loan balance','Equity'],
       tableItems: [],
     }
@@ -66,22 +64,24 @@ export default {
   methods: {
     changeBank() {
       this.tableItems.length = 0;
-      this.tableItems = []
-      this.loan = this.banks[this.selectedBank].minPayment * 2
-      this.minPayment = this.banks[this.selectedBank].minPayment
-      this.minRange = this.banks[this.selectedBank].minPayment * 2
-      this.maxRange = this.banks[this.selectedBank].maxLoan
-      this.stepRange = this.banks[this.selectedBank].minPayment / 4
+      this.tableItems = [];
+      this.loan = this.banks[this.selectedBank].minPayment * 2;
+      this.minPayment = this.banks[this.selectedBank].minPayment;
+      this.minRange = this.banks[this.selectedBank].minPayment * 2;
+      this.maxRange = this.banks[this.selectedBank].maxLoan;
+      this.stepRange = this.banks[this.selectedBank].minPayment / 4;
+      this.loanTerm = this.banks[this.selectedBank].loanTerm;
     },
     async getBanks(){
       try {
         this.loading = true;
         const response = await axios.get(`${this.server}/getBanks`)
-        this.loan = response.data[this.selectedBank].minPayment * 2
-        this.minPayment = response.data[this.selectedBank].minPayment
-        this.minRange = response.data[this.selectedBank].minPayment * 2
-        this.maxRange = response.data[this.selectedBank].maxLoan
-        this.stepRange = response.data[this.selectedBank].minPayment / 4
+        this.loan = response.data[this.selectedBank].minPayment * 2;
+        this.minPayment = response.data[this.selectedBank].minPayment;
+        this.minRange = response.data[this.selectedBank].minPayment * 2;
+        this.maxRange = response.data[this.selectedBank].maxLoan;
+        this.stepRange = response.data[this.selectedBank].minPayment / 4;
+        this.loanTerm = response.data[this.selectedBank].loanTerm;
 
         for(let i = 0; i < response.data.length; i++) {
           this.banks.push({

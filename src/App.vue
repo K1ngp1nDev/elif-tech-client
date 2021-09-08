@@ -1,8 +1,11 @@
 <template>
   <div id="app">
     <div id="nav">
+      <router-link to="/">Home</router-link> |
       <router-link to="/Management">Banks management</router-link> |
       <router-link to="/Calculator">Mortgage calculator</router-link>
+      <pre>single page full-stack application</pre>
+
     </div>
     <router-view/>
   </div>

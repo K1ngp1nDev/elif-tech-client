@@ -7,17 +7,15 @@
       </b-button>
       <div v-for="(bank, index) in banks" :key="bank._id" style="margin: 0.5em">
         <b-card :title="bank.name">
-          <b-card-text>{{bank._id}}</b-card-text>
           <b-card-text> Loan term: {{bank.loanTerm}} months. </b-card-text>
           <b-card-text> Max loan: {{bank.maxLoan}}$ </b-card-text>
-          <b-card-text> Min payment: {{bank.minPayment}}$ </b-card-text>
-          <b-card-text> Interest rate: {{bank.interestRate}}$ </b-card-text>
+          <b-card-text> Down payment: {{bank.minPayment}}$ </b-card-text>
+          <b-card-text> Interest rate: {{bank.interestRate}}% </b-card-text>
           <b-button variant="warning" class="action-banks" @click="$bvModal.show('edit-'+bank._id)">Edit</b-button>
           <b-button variant="danger" class="action-banks" @click="$bvModal.show('remove-'+bank._id)">Remove</b-button>
 
           <b-modal :id="'edit-'+bank._id" :title="bank.name" data-edit-modal scrollable>
             <b-form id="form-edit-bank">
-<!--              <b-form-input :id="'name-'+bank._id" type="text" :value="bank._id"/>-->
               <b-form-group :id="'input-name-group-'+index"
                             label="Bank name:" :label-for="'name-'+bank._id">
                 <b-form-input :id="'name-'+bank._id" type="text" class="edit-bank-input"
@@ -36,9 +34,9 @@
               </b-form-group>
 
               <b-form-group :id="'input-min-payment-group-'+index"
-                            label="Min payment($):" :label-for="'minPayment-'+bank._id">
+                            label="Down payment($):" :label-for="'minPayment-'+bank._id">
                 <b-form-input :id="'minPayment-'+bank._id" type="number" class="edit-bank-input"
-                              placeholder="Enter min payment" required
+                              placeholder="Enter down payment" required
                               :value="bank.minPayment"
                 ></b-form-input>
               </b-form-group>
@@ -61,20 +59,19 @@
 
             </b-form>
             <template #modal-footer="{ ok, cancel }">
-              <!--            bank.name,bank.maxLoan,bank.minPayment,bank.loanTerm,bank.interestRate-->
               <b-button variant="success"
                         @click="updateBank('edit-'+bank._id, bank._id,'name-'+bank._id,'maxLoan-'+bank._id,
                       'minPayment-'+bank._id,'loanTerm-'+bank._id,'interestRate-'+bank._id)">
-                Сохранить</b-button>
-              <b-button variant="danger" @click="cancel()"> Отмена </b-button>
+                Save</b-button>
+              <b-button variant="danger" @click="cancel()"> Cancel </b-button>
             </template>
           </b-modal>
           <b-modal :id="'remove-'+bank._id" :title="bank.name">
-            <h4>Вы точно хотите удалить {{bank.name}}?</h4>
+            <h4>Delete {{bank.name}}?</h4>
             <template #modal-footer="{ ok, cancel }">
               <b-button variant="success" v-on:click="$bvModal.hide('remove-'+bank._id)"
-                        @click="removeBank(bank.name)"> Да </b-button>
-              <b-button variant="danger" @click="cancel()"> Нет </b-button>
+                        @click="removeBank(bank.name)"> Yes </b-button>
+              <b-button variant="danger" @click="cancel()"> Cancel </b-button>
             </template>
           </b-modal>
         </b-card>
@@ -96,7 +93,7 @@
           </b-form-group>
 
           <b-form-group id="input-max-loan-group"
-                        label="Min payment($):" label-for="createBankMinPayment">
+                        label="Down payment($):" label-for="createBankMinPayment">
             <b-form-input id="createBankMinPayment" type="number" required :state="validationBankMinPayment"
                           v-model="newBankMinPayment" :value="newBankMinPayment"
             ></b-form-input>
@@ -119,18 +116,17 @@
         </b-form>
         <template #modal-footer="{ ok, cancel }">
           <b-button variant="success"
-                    @click="createBank()"> Создать </b-button>
-          <b-button variant="danger" @click="cancel()"> Отмена </b-button>
+                    @click="createBank()"> Create </b-button>
+          <b-button variant="danger" @click="cancel()"> Cancel </b-button>
         </template>
       </b-modal>
     </div>
     <div v-else>
       <b-button variant="primary" disabled>
         <b-spinner small type="grow"></b-spinner>
-        Загрузка...
+        Loading...
       </b-button>
     </div>
-
   </div>
 </template>
 
@@ -141,7 +137,7 @@ export default {
   name: "Management",
   data() {
     return {
-      server: `https://server-elif-tech.herokuapp.com`,
+      server: `https://server-elif-tech.herokuapp.com`, // SERVER ADDRESS
       loading: false,
       banks: [],
       newBankName: '',
